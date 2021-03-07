@@ -9,7 +9,7 @@ const nick = process.env.NICK;
 const targetChannel = process.env.TARGET_CHANNEL;
 const channels = [targetChannel];
 
-var BearerToken = process.env.BEARER_TOKEN;
+const BearerToken = process.env.BEARER_TOKEN;
 const tweetRe = /https?:\/\/(?:mobile\.)?twitter.com\/.+?\/status\/(\d+)/;
 
 const client = new Twitter({
@@ -20,11 +20,11 @@ ircserve();
 
 function ircserve()
 {
-    var client = new irc.Client(server, nick, {channels: channels});
+    const client = new irc.Client(server, nick, {channels: channels});
     client.addListener('message', async function (from, to, message) {
         // var str = jconv.convert(message, 'JIS', 'UTF8');
         // console.log('from:' + from + ' to:' + to + ' :message' + str);
-        var found = tweetRe.exec(message);
+        const found = tweetRe.exec(message);
         if ( found ) {
             const msgs = await tweetget(found[1]);
             msgs.forEach( m => client.notice(to, jconv.convert(m, 'UTF8', 'JIS')) );

@@ -27,7 +27,7 @@ function ircserve()
         var found = tweetRe.exec(message);
         if ( found ) {
             const msgs = await tweetget(found[1]);
-            msgs.forEach( m => client.notice(targetChannel, jconv.convert(m, 'UTF8', 'JIS')) );
+            msgs.forEach( m => client.notice(to, jconv.convert(m, 'UTF8', 'JIS')) );
         }
     });
 }

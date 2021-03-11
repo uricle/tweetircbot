@@ -1,0 +1,25 @@
+{
+  "name": "tweetircbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ircbot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uricle/tweetircbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uricle/tweetircbot/issues"
+  },
+  "homepage": "https://github.com/uricle/tweetircbot#readme",
+  "Dependencies": {
+    "dotenv": "^8.2.0",
+    "irc": "^0.5.2",
+    "jconv": "^0.1.5",
+    "twitter-v2": "^1.0.7"
+  }
+}

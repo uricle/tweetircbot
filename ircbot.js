@@ -31,7 +31,7 @@ const axios = axiosBase.create(
 // console.log(`s:${ServerEncode}`);
 // console.log(`c:${ClientEncode}`);
 ircserve();
-
+// amedasget('八王子');
 // --------------------------------------------------
 // 
 // --------------------------------------------------
@@ -155,16 +155,17 @@ async function amedasget(posname)
             sun1h,      // 1時間日照時間
         } = data;
         var res = `${amedastable[point].kjName}(${amedastable[point].knName}) ${hour}時の `;
-        res += `気温は${temp[0]}度 `;
-        res += `降水量:${precipitation1h[0]}mm/h `;
-        res += `風向は${windDir[windDirection[0]]} `;
-        res += `風速${wind[0]}m/s `;
-        res += `日照時間${sun1h[0]}h `;
-        res += `湿度${humidity[0]}% `;
-        res += `気圧${pressure[0]}hPa `;
-        res += `積雪${snow[0]}cm 降雪量:${snow1h[0]} `;
-        res += `最低気温 ${minTemp[0]}(${(minTempTime.hour+9)%24}:${minTempTime.minute}}) `;
-        res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}}) `;
+        if ( temp != undefined ) res += `気温は${temp[0]}度 `;
+        if ( precipitation1h != undefined ) res += `降水量:${precipitation1h[0]}mm/h `;
+        if ( windDir != undefined ) res += `風向は${windDir[windDirection[0]]} `;
+        if ( wind != undefined ) res += `風速${wind[0]}m/s `;
+        if ( sun1h != undefined ) res += `日照時間${sun1h[0]}h `;
+        if ( humidity != undefined ) res += `湿度${humidity[0]}% `;
+        if ( pressure != undefined ) res += `気圧${pressure[0]}hPa `;
+        if ( snow != undefined) res += `積雪${snow[0]}cm `;
+        if ( snow1h != undefined ) res += `降雪量:${snow1h[0]} `;
+        if ( minTemp != undefined ) res += `最低気温 ${minTemp[0]} (${(minTempTime.hour+9)%24}:${minTempTime.minute}}) `;
+        if ( maxTemp != undefined ) res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}}) `;
         // console.log(res);
         return res;
         // console.log(response.data.explanation);

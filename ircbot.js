@@ -32,7 +32,7 @@ const axios = axiosBase.create(
 // console.log(`c:${ClientEncode}`);
 ircserve();
 // amedasget('八王子');
-// amedasget('札幌');
+// amedasget('山口');
 // --------------------------------------------------
 // 
 // --------------------------------------------------
@@ -46,11 +46,11 @@ const procs = [
         }
     },
     {
-        pattern: /アメダス(.+?)(?:＞|>はむ)/,
+        pattern: /アメダス(.+?)(?:＞|>)はむ/,
         proc: async function (matchobj) {
             var target = matchobj[1];
-            const msg = await amedasget(target);
-            return [msg];
+            const msgs = await amedasget(target);
+            return msgs;
         }
     }
 ];
@@ -112,22 +112,24 @@ async function amedasget(posname)
             amedastable = tableresponse.data;
         }
         const targetpoint = posname;
-        var point = null;
+        let point = null;
         if (targetpoint in overwritepoint) {
-            point = overwritepoint[targetpoint];
+            point = [overwritepoint[targetpoint]];
         }
         if ( point == null ) {
             for ( key in amedastable ) {
                 if ( amedastable[key].kjName == targetpoint ) {
-                    point = key;
-                    break;
+                    if ( point == null ) point = [];
+                    point.push(key);
                 }
             }
         }
         if ( point == null ) {
-            return `${targetpoint} not found`;
+            return [`${targetpoint} not found`];
         }
         const cur = new Date();
+        // 毎時10分頃に更新され、3時間毎にまとめられる
+        cur.setMinutes(cur.getMinutes()-11);
         const curhour = Math.floor(cur.getHours()/3) * 3;
         cur.setHours(curhour);
         const year = cur.getFullYear();
@@ -136,44 +138,49 @@ async function amedasget(posname)
         const hour = ('0'+cur.getHours()).slice(-2);
         const targetTime = `${year}${month}${day}_${hour}`;
         // const targetIndex = `${year}${month}${day}${hour}0000`;
-        const response = await axios.get(`/data/point/${point}/${targetTime}.json`);
-        const keys = Object.keys(response.data).sort();
-        const targetIndex = keys[keys.length-1];
-        // console.log(response.data);
-        // 20210312205000
-        // YYYYMMDDHHMMSS
-        const mm = targetIndex.match(/\d{4}\d{2}\d{2}(\d{2})(\d{2})00/);
-        const lasttime = `${mm[1]}:${mm[2]}`;
-        const data = response.data[targetIndex];
-        const { 
-            temp,   // 温度
-            precipitation1h, // 1時間降水量
-            wind, // 風速
-            windDirection, // 風向
-            humidity,   // 湿度
-            maxTemp,    // 最高気温
-            maxTempTime,    // { hour: 時, minute: 分 }
-            minTemp,       // 最低気温
-            minTempTime,    // { hour: 時, minute: 分 }
-            pressure, // 現地気圧
-            snow,       // 積雪(cm)
-            snow1h,     // 1時間積雪
-            sun1h,      // 1時間日照時間
-        } = data;
-        var res = `${amedastable[point].kjName}(${amedastable[point].knName}) ${lasttime} `;
-        if ( temp != undefined ) res += `気温は${temp[0]}度 `;
-        if ( precipitation1h != undefined ) res += `降水量:${precipitation1h[0]}mm/h `;
-        if ( windDir != undefined ) res += `風向は${windDir[windDirection[0]]} `;
-        if ( wind != undefined ) res += `風速${wind[0]}m/s `;
-        if ( sun1h != undefined ) res += `日照時間${sun1h[0]}h `;
-        if ( humidity != undefined ) res += `湿度${humidity[0]}% `;
-        if ( pressure != undefined ) res += `気圧${pressure[0]}hPa `;
-        if ( snow != undefined) res += `積雪${snow[0]}cm `;
-        if ( snow1h != undefined ) res += `降雪量:${snow1h[0]} `;
-        if ( minTemp != undefined ) res += `最低気温 ${minTemp[0]} (${(minTempTime.hour+9)%24}:${minTempTime.minute}) `;
-        if ( maxTemp != undefined ) res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}) `;
-        // console.log(res);
-        return res;
+        const responses = [];
+        for ( key in point ) {
+            const pointid = point[key];
+            const response = await axios.get(`/data/point/${pointid}/${targetTime}.json`);
+            const keys = Object.keys(response.data).sort();
+            const targetIndex = keys[keys.length-1];
+            // console.log(response.data);
+            // 20210312205000
+            // YYYYMMDDHHMMSS
+            const mm = targetIndex.match(/\d{4}\d{2}\d{2}(\d{2})(\d{2})00/);
+            const lasttime = `${mm[1]}:${mm[2]}`;
+            const data = response.data[targetIndex];
+            const { 
+                temp,   // 温度
+                precipitation1h, // 1時間降水量
+                wind, // 風速
+                windDirection, // 風向
+                humidity,   // 湿度
+                maxTemp,    // 最高気温
+                maxTempTime,    // { hour: 時, minute: 分 }
+                minTemp,       // 最低気温
+                minTempTime,    // { hour: 時, minute: 分 }
+                pressure, // 現地気圧
+                snow,       // 積雪(cm)
+                snow1h,     // 1時間積雪
+                sun1h,      // 1時間日照時間
+            } = data;
+            var res = `${amedastable[pointid].kjName}(${amedastable[pointid].knName}) ${lasttime} `;
+            if ( temp != undefined ) res += `気温は${temp[0]}度 `;
+            if ( precipitation1h != undefined ) res += `降水量:${precipitation1h[0]}mm/h `;
+            if ( windDir != undefined ) res += `風向は${windDir[windDirection[0]]} `;
+            if ( wind != undefined ) res += `風速${wind[0]}m/s `;
+            if ( sun1h != undefined ) res += `日照時間${sun1h[0]}h `;
+            if ( humidity != undefined ) res += `湿度${humidity[0]}% `;
+            if ( pressure != undefined ) res += `気圧${pressure[0]}hPa `;
+            if ( snow != undefined) res += `積雪${snow[0]}cm `;
+            if ( snow1h != undefined ) res += `降雪量:${snow1h[0]} `;
+            if ( minTemp != undefined ) res += `最低気温 ${minTemp[0]} (${(minTempTime.hour+9)%24}:${minTempTime.minute}) `;
+            if ( maxTemp != undefined ) res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}) `;
+            // console.log(res);
+            responses.push(res);
+        }
+        return responses;
         // console.log(response.data.explanation);
     } catch(error) {
         const { status, statusText } = error.response ? error.response : { status: 0, statusText: error };

@@ -32,6 +32,7 @@ const axios = axiosBase.create(
 // console.log(`c:${ClientEncode}`);
 ircserve();
 // amedasget('八王子');
+// amedasget('札幌');
 // --------------------------------------------------
 // 
 // --------------------------------------------------
@@ -127,19 +128,22 @@ async function amedasget(posname)
             return `${targetpoint} not found`;
         }
         const cur = new Date();
-        if ( cur.getMinutes() < 10 ) {
-            cur.setHours(cur.getHours() - 2);
-        } else {
-            cur.setHours(cur.getHours() - 1);
-        }
+        const curhour = Math.floor(cur.getHours()/3) * 3;
+        cur.setHours(curhour);
         const year = cur.getFullYear();
         const month = ('0'+(cur.getMonth()+1)).slice(-2);
         const day = ('0'+cur.getDate()).slice(-2);
         const hour = ('0'+cur.getHours()).slice(-2);
         const targetTime = `${year}${month}${day}_${hour}`;
-        const targetIndex = `${year}${month}${day}${hour}0000`;
+        // const targetIndex = `${year}${month}${day}${hour}0000`;
         const response = await axios.get(`/data/point/${point}/${targetTime}.json`);
+        const keys = Object.keys(response.data).sort();
+        const targetIndex = keys[keys.length-1];
         // console.log(response.data);
+        // 20210312205000
+        // YYYYMMDDHHMMSS
+        const mm = targetIndex.match(/\d{4}\d{2}\d{2}(\d{2})(\d{2})00/);
+        const lasttime = `${mm[1]}:${mm[2]}`;
         const data = response.data[targetIndex];
         const { 
             temp,   // 温度
@@ -156,7 +160,7 @@ async function amedasget(posname)
             snow1h,     // 1時間積雪
             sun1h,      // 1時間日照時間
         } = data;
-        var res = `${amedastable[point].kjName}(${amedastable[point].knName}) ${hour}時の `;
+        var res = `${amedastable[point].kjName}(${amedastable[point].knName}) ${lasttime} `;
         if ( temp != undefined ) res += `気温は${temp[0]}度 `;
         if ( precipitation1h != undefined ) res += `降水量:${precipitation1h[0]}mm/h `;
         if ( windDir != undefined ) res += `風向は${windDir[windDirection[0]]} `;
@@ -166,8 +170,8 @@ async function amedasget(posname)
         if ( pressure != undefined ) res += `気圧${pressure[0]}hPa `;
         if ( snow != undefined) res += `積雪${snow[0]}cm `;
         if ( snow1h != undefined ) res += `降雪量:${snow1h[0]} `;
-        if ( minTemp != undefined ) res += `最低気温 ${minTemp[0]} (${(minTempTime.hour+9)%24}:${minTempTime.minute}}) `;
-        if ( maxTemp != undefined ) res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}}) `;
+        if ( minTemp != undefined ) res += `最低気温 ${minTemp[0]} (${(minTempTime.hour+9)%24}:${minTempTime.minute}) `;
+        if ( maxTemp != undefined ) res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}) `;
         // console.log(res);
         return res;
         // console.log(response.data.explanation);

@@ -127,9 +127,11 @@ async function amedasget(posname)
             return `${targetpoint} not found`;
         }
         const cur = new Date();
-        // if ( cur.getMinutes() < 10 ) {
-        cur.setHours(cur.getHours() - 1);
-        // }
+        if ( cur.getMinutes() < 10 ) {
+            cur.setHours(cur.getHours() - 2);
+        } else {
+            cur.setHours(cur.getHours() - 1);
+        }
         const year = cur.getFullYear();
         const month = ('0'+(cur.getMonth()+1)).slice(-2);
         const day = ('0'+cur.getDate()).slice(-2);

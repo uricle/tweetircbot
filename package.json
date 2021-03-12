@@ -16,7 +16,8 @@
     "url": "https://github.com/uricle/tweetircbot/issues"
   },
   "homepage": "https://github.com/uricle/tweetircbot#readme",
-  "Dependencies": {
+  "dependencies": {
+    "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "irc": "^0.5.2",
     "jconv": "^0.1.5",

@@ -68,10 +68,12 @@ function ircserve()
             const m = element.pattern.exec( str );
             if ( m ) {
                 const msgs = await element.proc(m);
-                msgs.forEach( m=> {
-                    const sendmessage = (ServerEncode == ClientEncode) ? m : jconv.convert(m, ClientEncode, ServerEncode);
-                    client.notice(to, sendmessage)
-                })
+                if ( msgs != null ) {
+                    msgs.forEach( m=> {
+                        const sendmessage = (ServerEncode == ClientEncode) ? m : jconv.convert(m, ClientEncode, ServerEncode);
+                        client.notice(to, sendmessage)
+                    })
+                }
             }
         });
     });

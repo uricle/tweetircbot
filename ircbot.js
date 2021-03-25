@@ -52,6 +52,12 @@ const procs = [
             const msgs = await amedasget(target);
             return msgs;
         }
+    },
+    {
+        pattern: /(https:\/\/www\.slideshare\.net\/.+?\/[\x1f-\x7f]+)/,
+        proc: async function (matchobj) {
+            return ["https://sssslide.com/" + matchobj[1]];
+        }
     }
 ];
 

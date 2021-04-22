@@ -145,7 +145,7 @@ async function amedasget(posname)
         const day = ('0'+cur.getDate()).slice(-2);
         const hour = ('0'+cur.getHours()).slice(-2);
         const targetTime = `${year}${month}${day}_${hour}`;
-        // const targetIndex = `${year}${month}${day}${hour}0000`;
+        const targetBase = `${year}${month}${day}${hour}0000`;
         const responses = [];
         for ( key in point ) {
             const pointid = point[key];
@@ -157,7 +157,11 @@ async function amedasget(posname)
             // YYYYMMDDHHMMSS
             const mm = targetIndex.match(/\d{4}\d{2}\d{2}(\d{2})(\d{2})00/);
             const lasttime = `${mm[1]}:${mm[2]}`;
+            const base = response.data[targetBase];
             const data = response.data[targetIndex];
+            for (k in data) {
+                base[k] = data[k];
+            }            
             const { 
                 temp,   // 温度
                 precipitation1h, // 1時間降水量
@@ -172,17 +176,17 @@ async function amedasget(posname)
                 snow,       // 積雪(cm)
                 snow1h,     // 1時間積雪
                 sun1h,      // 1時間日照時間
-            } = data;
+            } = base;
             var res = `${amedastable[pointid].kjName}(${amedastable[pointid].knName}) ${lasttime} `;
             if ( temp != undefined ) res += `気温は${temp[0]}度 `;
             if ( precipitation1h != undefined ) res += `降水量:${precipitation1h[0]}mm/h `;
-            if ( windDir != undefined ) res += `風向は${windDir[windDirection[0]]} `;
+            if ( windDirection != undefined ) res += `風向は${windDir[windDirection[0]]} `;
             if ( wind != undefined ) res += `風速${wind[0]}m/s `;
-            if ( sun1h != undefined ) res += `日照時間${sun1h[0]}h `;
+            if ( sun1h != undefined && sun1h[0] != null ) res += `日照時間${sun1h[0]}h `;
             if ( humidity != undefined ) res += `湿度${humidity[0]}% `;
             if ( pressure != undefined ) res += `気圧${pressure[0]}hPa `;
             if ( snow != undefined) res += `積雪${snow[0]}cm `;
-            if ( snow1h != undefined ) res += `降雪量:${snow1h[0]} `;
+            if ( snow1h != undefined ) res += `降雪量:${snow1h[0]}cm `;
             if ( minTemp != undefined ) res += `最低気温 ${minTemp[0]} (${(minTempTime.hour+9)%24}:${minTempTime.minute}) `;
             if ( maxTemp != undefined ) res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}) `;
             // console.log(res);

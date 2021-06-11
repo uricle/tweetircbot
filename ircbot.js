@@ -3,6 +3,7 @@ const irc = require('irc');
 const jconv = require('jconv');
 const Twitter = require('twitter-v2');
 const axiosBase = require('axios');
+const decode = require('html-entities').decode;
 require('dotenv').config();
 
 const server = process.env.SERVER;
@@ -185,8 +186,9 @@ async function amedasget(posname)
             if ( sun1h != undefined && sun1h[0] != null ) res += `日照時間${sun1h[0]}h `;
             if ( humidity != undefined && humidity[0] != null ) res += `湿度${humidity[0]}% `;
             if ( pressure != undefined && pressure[0] != null ) res += `気圧${pressure[0]}hPa `;
-            if ( snow != undefined && snow[0] != null ) res += `積雪${snow[0]}cm `;
-            if ( snow1h != undefined && snow1h[0] != null ) res += `降雪量:${snow1h[0]}cm `;
+            var usesnow = ( snow != undefined && snow[0] != null );
+            if ( usesnow ) res += `積雪${snow[0]}cm `;
+            if ( usesnow && snow1h != undefined && snow1h[0] != null ) res += `降雪量:${snow1h[0]}cm `;
             if ( minTemp != undefined ) res += `最低気温 ${minTemp[0]} (${(minTempTime.hour+9)%24}:${minTempTime.minute}) `;
             if ( maxTemp != undefined ) res += `最高気温 ${maxTemp[0]}(${(maxTempTime.hour+9)%24}:${maxTempTime.minute}) `;
             // console.log(res);
@@ -207,7 +209,7 @@ async function amedasget(posname)
 async function tweetget(id)
 {
     const { data } = await twitterClient.get('tweets', { ids: id });
-    const msg = [...data[0].text];
+    const msg = [...decode(data[0].text)];
     const len = 200;
     const messages = msg.reduce( (acc, c, i) => i % len ? acc : [...acc, msg.slice( i, i + len).join('') ], [] );
     return messages;

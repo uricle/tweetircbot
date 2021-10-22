@@ -179,11 +179,13 @@ async function amedasget(posname)
                 sun1h,      // 1時間日照時間
             } = base;
             var res = `${amedastable[pointid].kjName}(${amedastable[pointid].knName}) ${lasttime} `;
-            if ( temp != undefined ) res += `気温は${temp[0]}度 `;
-            if ( precipitation1h != undefined ) res += `降水量:${precipitation1h[0]}mm/h `;
-            if ( windDirection != undefined ) res += `風向は${windDir[windDirection[0]]} `;
-            if ( wind != undefined ) res += `風速${wind[0]}m/s `;
-            if ( sun1h != undefined && sun1h[0] != null ) res += `日照時間${sun1h[0]}h `;
+            if ( temp != undefined && temp[0] != null ) res += `気温は${temp[0]}度 `;
+            if ( precipitation1h != undefined && precipitation1h[0] != null ) res += `降水量:${precipitation1h[0]}mm/h `;
+            if ( windDirection != undefined ) {
+                var winddir = windDir[windDirection[0]];
+                if ( winddir != undefined ) res += `風向は${winddir} `;
+            }
+            if ( wind != undefined && wind[0] != null ) res += `風速${wind[0]}m/s `;            if ( sun1h != undefined && sun1h[0] != null ) res += `日照時間${sun1h[0]}h `;
             if ( humidity != undefined && humidity[0] != null ) res += `湿度${humidity[0]}% `;
             if ( pressure != undefined && pressure[0] != null ) res += `気圧${pressure[0]}hPa `;
             var usesnow = ( snow != undefined && snow[0] != null );

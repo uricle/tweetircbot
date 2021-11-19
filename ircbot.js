@@ -42,8 +42,12 @@ const procs = [
         pattern: /https?:\/\/(?:mobile\.)?twitter.com\/.+?\/status\/(\d+)/,
         proc : async function (matchobj) {
             var said = matchobj[1];
-            const msgs = await tweetget(said);
-            return msgs;
+            try {
+                const msgs = await tweetget(said);
+                return msgs;
+            } catch (error) {
+                return ['twitter get error (' + error + ')'];
+            }
         }
     },
     {
